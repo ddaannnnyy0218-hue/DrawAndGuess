@@ -8,6 +8,27 @@
       "when": 1792311786313,
       "tag": "0000_far_loki",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1792334448213,
+      "tag": "0001_dusty_manta",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1792392928074,
+      "tag": "0002_aromatic_roulette",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1792399566585,
+      "tag": "0003_word_memory",
+      "breakpoints": true
     }
   ]
 }

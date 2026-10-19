@@ -1,0 +1,16 @@
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {createRequire} from 'node:module';
+import {pathToFileURL} from 'node:url';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import ts from 'typescript';
+const require=createRequire(import.meta.url),mfRequire=createRequire(createRequire(require.resolve('wrangler/package.json')).resolve('miniflare')),sharp=mfRequire('sharp');
+const source=readFileSync('components/rank-badge.tsx','utf8').replace("'../lib/ranks.js'",JSON.stringify(pathToFileURL(resolve('lib/ranks.js')).href));
+const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+mkdirSync('node_modules/.cache',{recursive:true});const modulePath=resolve('node_modules/.cache/rank-preview.mjs');writeFileSync(modulePath,compiled);
+const {RankBadge}=await import(pathToFileURL(modulePath).href+'?t='+Date.now()),points=[0,200,500,900,1400,2000];
+const html=renderToStaticMarkup(React.createElement(React.Fragment,null,...points.map((p,i)=>React.createElement(RankBadge,{key:i,points:p}))));
+const svgs=[...html.matchAll(/<svg[\s\S]*?<\/svg>/g)].map(m=>m[0].replace('<svg ', '<svg width="200" height="220" ')),names=['BRONZE','SILVER','GOLD','PLATINUM','DIAMOND','MASTER'];
+const sheet='<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="300"><rect width="1320" height="300" fill="#f4f3ed"/>'+svgs.map((svg,i)=>'<g transform="translate('+(i*220+10)+',10)">'+svg+'<text x="100" y="258" fill="#5a674c" text-anchor="middle" font-family="sans-serif" font-size="15">'+names[i]+'</text></g>').join('')+'</svg>';
+const destination=process.argv[2]||resolve('node_modules/.cache/rank-badges.png');await sharp(Buffer.from(sheet)).png().toFile(destination);console.log(destination);

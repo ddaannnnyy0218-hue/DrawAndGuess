@@ -1,0 +1,73 @@
+{
+  "fixtures": 113,
+  "totalSimulatedRounds": 10848,
+  "scope": "Fixed real-human trace replay regression; not live human win rates.",
+  "bands": [
+    {
+      "rp": 0,
+      "simulatedRounds": 1808,
+      "attemptedPercent": 100,
+      "solvedPercent": 97.8,
+      "medianFirstSeconds": 15,
+      "medianCorrectSeconds": 29,
+      "wrongGuessesPerRound": 1.08,
+      "slowStyleFirstSeconds": 16.5,
+      "quickStyleFirstSeconds": 13.5
+    },
+    {
+      "rp": 250,
+      "simulatedRounds": 1808,
+      "attemptedPercent": 100,
+      "solvedPercent": 98,
+      "medianFirstSeconds": 13.5,
+      "medianCorrectSeconds": 27.5,
+      "wrongGuessesPerRound": 1.21,
+      "slowStyleFirstSeconds": 15,
+      "quickStyleFirstSeconds": 12
+    },
+    {
+      "rp": 550,
+      "simulatedRounds": 1808,
+      "attemptedPercent": 100,
+      "solvedPercent": 98.7,
+      "medianFirstSeconds": 12.5,
+      "medianCorrectSeconds": 25,
+      "wrongGuessesPerRound": 1.34,
+      "slowStyleFirstSeconds": 13.5,
+      "quickStyleFirstSeconds": 11
+    },
+    {
+      "rp": 950,
+      "simulatedRounds": 1808,
+      "attemptedPercent": 99.6,
+      "solvedPercent": 98.6,
+      "medianFirstSeconds": 13.5,
+      "medianCorrectSeconds": 23.5,
+      "wrongGuessesPerRound": 0.86,
+      "slowStyleFirstSeconds": 12,
+      "quickStyleFirstSeconds": 18.5
+    },
+    {
+      "rp": 1500,
+      "simulatedRounds": 1808,
+      "attemptedPercent": 99.1,
+      "solvedPercent": 99.1,
+      "medianFirstSeconds": 20,
+      "medianCorrectSeconds": 23,
+      "wrongGuessesPerRound": 0.36,
+      "slowStyleFirstSeconds": 20.5,
+      "quickStyleFirstSeconds": 19.5
+    },
+    {
+      "rp": 2100,
+      "simulatedRounds": 1808,
+      "attemptedPercent": 99.1,
+      "solvedPercent": 99.1,
+      "medianFirstSeconds": 19.5,
+      "medianCorrectSeconds": 22.5,
+      "wrongGuessesPerRound": 0.36,
+      "slowStyleFirstSeconds": 20,
+      "quickStyleFirstSeconds": 19.5
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "画里有话 · Draw & Guess",
-  description: "画得离谱，猜得默契。点链接，和朋友一起玩的多人绘画猜词游戏。",
+  description: "段位对战、假答案和好友画猜。用创意画笔，画出下一段位。",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

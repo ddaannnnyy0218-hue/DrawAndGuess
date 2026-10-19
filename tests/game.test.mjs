@@ -48,6 +48,12 @@ test('room access, hidden answers and private word choices',async()=>{
   assert.equal((await get(r.db,{...r.players[1],token:'wrong'},r.now+300)).status,401);
   assert.equal((await r.call(1,'select',{index:0})).status,403);
 });
+test('hosts can use a custom word deck; invalid decks and guest edits are rejected',async()=>{const db=database(),now=Date.now(),host=await post(db,{action:'create',name:'Host'},now),guest=await post(db,{action:'join',name:'Guest',code:host.code},now+1),settings={action:'settings',code:host.code,pack:'everyday',seconds:40,cycles:1,mode:'classic'};
+ assert.equal((await post(db,{...settings,token:guest.token,customWords:'宇航员、月球基地、太空早餐'},now+100)).status,403);
+ assert.equal((await post(db,{...settings,token:host.token,customWords:'一个、两个'},now+200)).status,400);
+ const saved=await post(db,{...settings,token:host.token,customWords:'宇航员、月球基地、太空早餐、宇航员'},now+300);assert.deepEqual(saved.state.settings.customWords,['宇航员','月球基地','太空早餐']);
+ const start=await post(db,{action:'start',code:host.code,token:host.token},now+400);assert.equal(start.state.choices.length,3);assert.ok(start.state.choices.every(w=>saved.state.settings.customWords.includes(w)));const selected=await post(db,{action:'select',code:host.code,token:host.token,index:0},now+500);const guessed=await post(db,{action:'guess',code:host.code,token:guest.token,text:selected.state.word},now+5000);assert.equal(guessed.state.phase,'reveal');
+});
 test('correct guesses award both players once and never reveal a live answer in chat',async()=>{
   const r=await room();await r.call(0,'select',{index:0});
   const word=(await get(r.db,r.players[0],r.now+200)).state.word;
