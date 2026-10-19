@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index, uniqueIndex, primaryKey } from 'drizzle-orm/sqlite-core';
 export const rooms = sqliteTable('game_rooms', {
   code: text('code').primaryKey(),
   state: text('state').notNull(),
@@ -37,3 +37,18 @@ export const rankedResults=sqliteTable('ranked_results',{
 export const rankedMemory=sqliteTable('ranked_memory',{
  profileId:text('profile_id').primaryKey(),words:text('words').notNull().default('[]'),sources:text('sources').notNull().default('[]'),
 });
+export const gameAccounts=sqliteTable('game_accounts',{
+ userId:text('user_id').primaryKey(),profileId:text('profile_id').notNull().unique().references(()=>rankedProfiles.id),autoPlay:integer('auto_play').notNull().default(1),createdAt:integer('created_at').notNull(),
+});
+export const friendLinks=sqliteTable('friend_links',{
+ tokenHash:text('token_hash').primaryKey(),creatorId:text('creator_id').notNull().references(()=>rankedProfiles.id),expiresAt:integer('expires_at').notNull(),acceptedBy:text('accepted_by'),createdAt:integer('created_at').notNull(),
+},table=>[index('friend_links_creator_expiry').on(table.creatorId,table.expiresAt)]);
+export const friendships=sqliteTable('friendships',{
+ firstId:text('first_id').notNull(),secondId:text('second_id').notNull(),createdAt:integer('created_at').notNull(),
+},table=>[primaryKey({columns:[table.firstId,table.secondId]}),index('friendships_second').on(table.secondId)]);
+export const roomInvitations=sqliteTable('room_invitations',{
+ id:text('id').primaryKey(),senderId:text('sender_id').notNull(),recipientId:text('recipient_id').notNull(),roomCode:text('room_code').notNull(),createdAt:integer('created_at').notNull(),expiresAt:integer('expires_at').notNull(),
+},table=>[uniqueIndex('room_invitations_pair_room').on(table.senderId,table.recipientId,table.roomCode),index('room_invitations_recipient_expiry').on(table.recipientId,table.expiresAt)]);
+export const accountRateLimits=sqliteTable('account_rate_limits',{
+ bucket:text('bucket').primaryKey(),count:integer('count').notNull(),expiresAt:integer('expires_at').notNull(),
+},table=>[index('account_rate_expiry').on(table.expiresAt)]);
