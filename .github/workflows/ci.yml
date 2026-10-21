@@ -1,0 +1,77 @@
+name: Code checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: code-checks-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Typecheck, tests and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CI: 'true'
+      # Match pnpm-workspace.yaml, using a runner-owned store for cache reuse.
+      SITES_PNPM_SHARED_STORE: ${{ github.workspace }}/.sites-runtime/pnpm-store
+      CLOUDFLARE_CF_FETCH_ENABLED: 'false'
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24.19.0'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install locked dependencies
+        id: install
+        timeout-minutes: 10
+        run: pnpm install --frozen-lockfile --prefer-offline
+      # Run all checks after installation, even if a preceding check failed.
+      # No continue-on-error: any failed command still fails the job and PR check.
+      - name: TypeScript typecheck
+        id: typecheck
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        timeout-minutes: 3
+        run: pnpm typecheck
+      - name: Existing functional tests
+        id: test
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        timeout-minutes: 3
+        run: pnpm test
+      - name: Production build (no deployment)
+        id: build
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        timeout-minutes: 5
+        run: pnpm build
+      - name: Check summary
+        if: ${{ always() }}
+        env:
+          INSTALL_RESULT: ${{ steps.install.outcome }}
+          TYPECHECK_RESULT: ${{ steps.typecheck.outcome }}
+          TEST_RESULT: ${{ steps.test.outcome }}
+          BUILD_RESULT: ${{ steps.build.outcome }}
+        run: |
+          {
+            echo '| Check | Result |'
+            echo '| --- | --- |'
+            echo "| Dependency installation | $INSTALL_RESULT |"
+            echo "| TypeScript | $TYPECHECK_RESULT |"
+            echo "| Functional tests | $TEST_RESULT |"
+            echo "| Production build | $BUILD_RESULT |"
+            echo ''
+            echo 'Build validation only. No deployment or Cloudflare CPU/performance guarantee.'
+          } >> "$GITHUB_STEP_SUMMARY"
