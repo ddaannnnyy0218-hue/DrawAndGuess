@@ -21,7 +21,7 @@ jobs:
     env:
       CI: 'true'
       # Match pnpm-workspace.yaml, using a runner-owned store for cache reuse.
-      SITES_PNPM_SHARED_STORE: ${{ runner.temp }}/pnpm-store
+      SITES_PNPM_SHARED_STORE: ${{ github.workspace }}/.sites-runtime/pnpm-store
       CLOUDFLARE_CF_FETCH_ENABLED: 'false'
       WRANGLER_SEND_METRICS: 'false'
     steps:
